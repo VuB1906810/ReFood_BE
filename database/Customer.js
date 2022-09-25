@@ -56,8 +56,9 @@ class Customer {
     async create(CustomerId, CustomerName, CustomerPhone, CustomerEmail, CustomerPassword, CustomerState) {
         return new Promise((resolve, reject) => {
             dbConnect.connect(() => {
-                const sql = "INSERT INTO khach_hang(KH_MAKH, KH_TENKH, KH_SDT, KH_EMAIL, KH_MATKHAU, KH_TRANGTHAI) VALUES (?,?,?,?,?,?)";
-                dbConnect.query(sql, [CustomerId, CustomerName, CustomerPhone, CustomerEmail, CustomerPassword, CustomerState], (err, result) => {
+                const sql = "call THEM_KHACH_HANG (?, ?, ?, ?)";
+                // const sql = "INSERT INTO khach_hang(KH_MAKH, KH_TENKH, KH_SDT, KH_EMAIL, KH_MATKHAU, KH_TRANGTHAI) VALUES (?,?,?,?,?,?)";
+                dbConnect.query(sql, [CustomerName, CustomerPhone, CustomerEmail, CustomerPassword], (err, result) => {
                     if (err) {
                         return reject(err)
                     }

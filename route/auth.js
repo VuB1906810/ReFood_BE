@@ -2,7 +2,6 @@ const express = require('express')
 const argon2 = require('argon2')
 const jwt = require('jsonwebtoken')
 const router = express.Router();
-const dbConnect = require('../database/dbconnect');
 const Customer = require('../database/Customer')
 const { v4: uuidv4 } = require('uuid');
 const verifyToken = require('../authentication/auth')
@@ -58,15 +57,15 @@ router.post('/login', async (req, res) => {
 router.post('/register', async (req, res) => {
     const { phonenumber, password, name, repassword } = req.body;
     if (!phonenumber || !password)
-        return res.status(200).json({ success: false, message: 'Phone number or password is missing' })
+        return res.status(400).json({ success: false, message: 'Phone number or password is missing' })
     else if (phonenumber.match(/.*\S.*/) == null || password.match(/.*\S.*/) == null)
-        return res.status(200).json({ success: false, message: 'Phone number or password is missing' })
+        return res.status(400).json({ success: false, message: 'Phone number or password is missing' })
     else if (phonenumber.match(/(84|0[3|5|7|8|9])+([0-9]{8})\b/) == null)
-        return res.status(200).json({ success: false, message: 'Phone number is not valid' })
+        return res.status(400).json({ success: false, message: 'Phone number is not valid' })
     else if (password !== repassword)
-        return res.status(200).json({ success: false, message: 'Password is not match' })
+        return res.status(400).json({ success: false, message: 'Password is not match' })
     else if (name.match(/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u) == null)
-        return res.status(200).json({ success: false, message: 'Name is not valid!' })
+        return res.status(400).json({ success: false, message: 'Name is not valid!' })
     else
         try {
             let foundedCustomer
@@ -80,7 +79,7 @@ router.post('/register', async (req, res) => {
                 let hashPassword = await argon2.hash(password)
                 let newAddedCustomer
                 await new Customer()
-                    .create(uuidv4(), name, phonenumber, null, hashPassword, 1)
+                    .create(uuidv4(), name, phonenumber, null, password, 1)
                     .then((customer) => {
                         newAddedCustomer = customer
                     })
@@ -98,7 +97,7 @@ router.post('/register', async (req, res) => {
                         }
                     });
             } else
-                return res.status(200).json({ success: false, message: 'Phone number is already registed for another user' });
+                return res.status(400).json({ success: false, message: 'Phone number is already registed for another user' });
         } catch (err) {
             console.log(err)
             return res.status(500).json({ success: false, message: 'Internal server error' })

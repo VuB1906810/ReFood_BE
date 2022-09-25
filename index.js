@@ -5,6 +5,7 @@ const cors = require('cors')
 const app = express()
 const PORT = process.env.PORT
 const auth = require('./route/auth');
+const food = require('./route/food');
 app.use(express.json())
 app.use(bodyParser.json({ limit: '10000mb', extended: true }));
 app.use(bodyParser.urlencoded({
@@ -21,4 +22,5 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', auth);
+app.use('/food', food);
 
